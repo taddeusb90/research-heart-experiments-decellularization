@@ -1,4 +1,6 @@
-tfjs_models/*
-logs/*
-models/*
-mlruns/*
+tfjs_models
+logs
+models
+mlruns
+.ipynb_checkpoints
+.idea
