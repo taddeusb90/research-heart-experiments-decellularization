@@ -1,0 +1,4 @@
+tfjs_models/*
+logs/*
+models/*
+mlruns/*
