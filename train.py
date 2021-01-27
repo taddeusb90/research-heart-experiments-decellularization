@@ -147,7 +147,7 @@ if __name__ == "__main__":
     validation_steps = ceil(validation_generator.samples/validation_generator.batch_size)
     test_steps = ceil(test_generator.samples/test_generator.batch_size)
 
-    RUN_NAME = f"cnn-all-loss-s{size}-bs{batch_size}-e{epochs}-spe{steps_per_epoch}-dr{dropout}-fn{filter_number}-lr{learning_rate}-rt{regularization_type}-rr{regularization_rate}"
+    RUN_NAME = f"cnn-s{size}-bs{batch_size}-e{epochs}-spe{steps_per_epoch}-dr{dropout}-fn{filter_number}-lr{learning_rate}-rt{regularization_type}-rr{regularization_rate}-{start_run_time}"
 
     target_dir = './models/'
 
@@ -163,7 +163,7 @@ if __name__ == "__main__":
     callbacks = [
         EarlyStopping(monitor='val_loss', patience=10, verbose=1, mode='auto'),
         ModelCheckpoint(best_model_file, monitor='val_loss', verbose=1, save_best_only=True),
-        TensorBoard(f"logs/{RUN_NAME}-{start_run_time}")
+        TensorBoard(f"logs/{RUN_NAME}")
     ]
 
     with mlflow.start_run():
@@ -171,6 +171,8 @@ if __name__ == "__main__":
         mlflow.log_param('batch_size', batch_size)
         mlflow.log_param('epochs', epochs)
         mlflow.log_param('steps_per_epoch', steps_per_epoch)
+        mlflow.log_param('validation_steps', validation_steps)
+        mlflow.log_param('test_steps', test_steps)
         mlflow.log_param('dropout', dropout)
         mlflow.log_param("filter_number", filter_number)
         mlflow.log_param("learning_rate", learning_rate)
@@ -226,9 +228,6 @@ if __name__ == "__main__":
             mlflow.tensorflow.log_model(model, "models", registered_model_name=RUN_NAME)
         else:
             mlflow.keras.log_model(model, "models")
-
-        predictions = model.predict_generator(test_generator, steps=test_steps, verbose=1)
-        predictions = np.argmax(predictions, axis=1)
 
         print('Confusion Matrix')
         cm = confusion_matrix(test_generator.classes, predictions)
